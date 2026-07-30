@@ -12,16 +12,18 @@ Related Nest docs:
 
 ## 1. What you are managing
 
-| Piece | Meaning |
-|-------|---------|
-| **PostgreSQL server** | The database engine running in the background |
-| **Database** | A named container for your app data (`notes_app`) |
-| **Schema** | Namespace inside a DB (default is `public`) |
-| **Table** | Rows + columns (like a spreadsheet with rules) |
-| **Row** | One record |
-| **Column** | One field (`id`, `title`, …) |
-| **Relation** | How tables link (via foreign keys) |
-| **psql** | Official CLI client for PostgreSQL |
+
+| Piece                 | Meaning                                           |
+| --------------------- | ------------------------------------------------- |
+| **PostgreSQL server** | The database engine running in the background     |
+| **Database**          | A named container for your app data (`notes_app`) |
+| **Schema**            | Namespace inside a DB (default is `public`)       |
+| **Table**             | Rows + columns (like a spreadsheet with rules)    |
+| **Row**               | One record                                        |
+| **Column**            | One field (`id`, `title`, …)                      |
+| **Relation**          | How tables link (via foreign keys)                |
+| **psql**              | Official CLI client for PostgreSQL                |
+
 
 Typical Nest flow later:
 
@@ -33,7 +35,11 @@ This file focuses on the **PostgreSQL + WSL** side.
 
 ---
 
+
+
 ## 2. Install PostgreSQL on WSL
+
+
 
 ### Update packages
 
@@ -41,6 +47,8 @@ This file focuses on the **PostgreSQL + WSL** side.
 sudo apt update
 sudo apt upgrade -y
 ```
+
+
 
 ### Install PostgreSQL
 
@@ -55,6 +63,8 @@ psql --version
 ```
 
 ---
+
+
 
 ## 3. Start / stop / status (service management)
 
@@ -98,6 +108,8 @@ pg_isready
 
 ---
 
+
+
 ## 4. First login: the `postgres` OS user
 
 PostgreSQL creates a Linux user named `postgres`. Switch to it:
@@ -114,18 +126,22 @@ postgres=#
 
 Useful meta-commands inside `psql`:
 
-| Command | What it does |
-|---------|----------------|
-| `\l` | List databases |
-| `\c dbname` | Connect to a database |
-| `\dt` | List tables |
-| `\d table_name` | Describe a table (columns, keys) |
-| `\du` | List roles/users |
-| `\q` | Quit |
-| `\?` | Help for psql commands |
-| `\h CREATE TABLE` | SQL help for a statement |
+
+| Command           | What it does                     |
+| ----------------- | -------------------------------- |
+| `\l`              | List databases                   |
+| `\c dbname`       | Connect to a database            |
+| `\dt`             | List tables                      |
+| `\d table_name`   | Describe a table (columns, keys) |
+| `\du`             | List roles/users                 |
+| `\q`              | Quit                             |
+| `\?`              | Help for psql commands           |
+| `\h CREATE TABLE` | SQL help for a statement         |
+
 
 ---
+
+
 
 ## 5. Create a role (user) and a database for your app
 
@@ -140,6 +156,8 @@ sudo -u postgres createuser --interactive
 
 sudo -u postgres createdb notes_app -O nestuser
 ```
+
+
 
 ### Option B — SQL inside `psql`
 
@@ -165,6 +183,8 @@ If it asks for a password and auth fails, see [Section 12: peer vs md5/scram](#1
 
 ---
 
+
+
 ## 6. Connection string (what Nest/Prisma will use)
 
 Format:
@@ -189,6 +209,8 @@ Add `.env` to `.gitignore`.
 
 ---
 
+
+
 ## 7. Tables: the basics
 
 A table defines columns and constraints.
@@ -206,21 +228,27 @@ CREATE TABLE notes (
 
 What each part means:
 
-| Piece | Meaning |
-|-------|---------|
-| `SERIAL` | Auto-increment integer (`1, 2, 3…`) |
-| `PRIMARY KEY` | Unique identity of each row |
-| `VARCHAR(200)` | Short string with max length |
-| `TEXT` | Unlimited-ish text |
-| `NOT NULL` | Required value |
-| `DEFAULT NOW()` | Fill automatically if omitted |
-| `TIMESTAMPTZ` | Timestamp with time zone (recommended) |
+
+| Piece           | Meaning                                |
+| --------------- | -------------------------------------- |
+| `SERIAL`        | Auto-increment integer (`1, 2, 3…`)    |
+| `PRIMARY KEY`   | Unique identity of each row            |
+| `VARCHAR(200)`  | Short string with max length           |
+| `TEXT`          | Unlimited-ish text                     |
+| `NOT NULL`      | Required value                         |
+| `DEFAULT NOW()` | Fill automatically if omitted          |
+| `TIMESTAMPTZ`   | Timestamp with time zone (recommended) |
+
+
+
 
 ### Inspect the table
 
 ```sql
 \d notes
 ```
+
+
 
 ### Insert / read / update / delete
 
@@ -238,6 +266,8 @@ WHERE id = 1;
 
 DELETE FROM notes WHERE id = 1;
 ```
+
+
 
 ### Change a table later (migrations mindset)
 
@@ -259,16 +289,20 @@ DROP TABLE IF EXISTS notes;
 
 ---
 
+
+
 ## 8. Keys and constraints (rules for clean data)
 
-| Constraint | Purpose |
-|------------|---------|
-| `PRIMARY KEY` | Uniquely identifies a row |
+
+| Constraint    | Purpose                          |
+| ------------- | -------------------------------- |
+| `PRIMARY KEY` | Uniquely identifies a row        |
 | `FOREIGN KEY` | Points to a row in another table |
-| `UNIQUE` | No duplicates in that column/set |
-| `NOT NULL` | Value required |
-| `CHECK` | Custom rule (`price >= 0`) |
-| `DEFAULT` | Value when none provided |
+| `UNIQUE`      | No duplicates in that column/set |
+| `NOT NULL`    | Value required                   |
+| `CHECK`       | Custom rule (`price >= 0`)       |
+| `DEFAULT`     | Value when none provided         |
+
 
 Example:
 
@@ -282,6 +316,8 @@ CREATE TABLE users (
 ```
 
 ---
+
+
 
 ## 9. Relations between tables
 
@@ -347,6 +383,8 @@ JOIN users ON users.id = notes.user_id;
 
 ---
 
+
+
 ### 9.2 One-to-One
 
 One **user** has one **profile**.
@@ -367,6 +405,8 @@ CREATE TABLE profiles (
 `UNIQUE` on `user_id` enforces **at most one** profile per user.
 
 ---
+
+
 
 ### 9.3 Many-to-Many
 
@@ -413,33 +453,41 @@ WHERE notes.id = 1;
 
 ---
 
+
+
 ## 10. Relation decision cheat sheet
 
-| Real-world sentence | Relation | How to model |
-|---------------------|----------|--------------|
-| A user has many notes | One-to-Many | FK on the “many” side (`notes.user_id`) |
-| A note belongs to one user | Many-to-One | Same as above (other direction) |
-| A user has one profile | One-to-One | FK + `UNIQUE` |
-| Notes have many tags / tags on many notes | Many-to-Many | Join table |
+
+| Real-world sentence                       | Relation     | How to model                            |
+| ----------------------------------------- | ------------ | --------------------------------------- |
+| A user has many notes                     | One-to-Many  | FK on the “many” side (`notes.user_id`) |
+| A note belongs to one user                | Many-to-One  | Same as above (other direction)         |
+| A user has one profile                    | One-to-One   | FK + `UNIQUE`                           |
+| Notes have many tags / tags on many notes | Many-to-Many | Join table                              |
+
 
 **Rule of thumb:**
 
 - Put the foreign key on the **child / dependent** table for 1:N  
 - Use a **join table** for N:N  
-- Add `UNIQUE` on the FK for 1:1  
+- Add `UNIQUE` on the FK for 1:1
 
 ---
+
+
 
 ## 11. Referential actions (`ON DELETE` / `ON UPDATE`)
 
 When a parent row changes, what happens to children?
 
-| Action | Meaning |
-|--------|---------|
-| `CASCADE` | Also delete/update children |
-| `RESTRICT` / `NO ACTION` | Block parent delete if children exist |
-| `SET NULL` | Set FK to `NULL` (column must allow null) |
-| `SET DEFAULT` | Set FK to its default |
+
+| Action                   | Meaning                                   |
+| ------------------------ | ----------------------------------------- |
+| `CASCADE`                | Also delete/update children               |
+| `RESTRICT` / `NO ACTION` | Block parent delete if children exist     |
+| `SET NULL`               | Set FK to `NULL` (column must allow null) |
+| `SET DEFAULT`            | Set FK to its default                     |
+
 
 Examples:
 
@@ -454,6 +502,8 @@ user_id INTEGER REFERENCES users(id) ON DELETE RESTRICT
 Choose deliberately. For learning notes owned by users, `CASCADE` is common.
 
 ---
+
+
 
 ## 12. Authentication on WSL (peer vs password)
 
@@ -502,13 +552,19 @@ ALTER USER nestuser WITH PASSWORD 'strongpassword';
 
 ---
 
+
+
 ## 13. Useful day-to-day management commands
+
+
 
 ### Backup one database
 
 ```bash
 pg_dump -h localhost -U nestuser -d notes_app -F c -f notes_app.dump
 ```
+
+
 
 ### Restore
 
@@ -523,12 +579,16 @@ pg_dump -h localhost -U nestuser -d notes_app > notes_app.sql
 psql -h localhost -U nestuser -d notes_app < notes_app.sql
 ```
 
+
+
 ### List databases / size
 
 ```sql
 \l
 SELECT pg_size_pretty(pg_database_size('notes_app'));
 ```
+
+
 
 ### Kill idle connections (sometimes useful in WSL)
 
@@ -539,6 +599,8 @@ WHERE datname = 'notes_app';
 ```
 
 ---
+
+
 
 ## 14. Practice lab (do this once)
 
@@ -602,6 +664,8 @@ If that query returns rows with user, note titles, and tags, you understand enou
 
 ---
 
+
+
 ## 15. From raw SQL to Nest
 
 Same relations in Prisma-style thinking:
@@ -651,6 +715,8 @@ You do **not** need Prisma yet to learn tables. Knowing SQL relations first make
 
 ---
 
+
+
 ## 16. Beginner checklist
 
 - [ ] PostgreSQL installed on WSL  
@@ -665,16 +731,20 @@ You do **not** need Prisma yet to learn tables. Knowing SQL relations first make
 
 ---
 
+
+
 ## 17. Common WSL problems
 
-| Problem | Likely fix |
-|---------|------------|
-| `connection refused` on `5432` | `sudo service postgresql start` |
-| `password authentication failed` | Reset password; check `pg_hba.conf`; use `-h localhost` |
-| `peer authentication failed` | Connect with matching OS user, or use password + host |
-| Service dies after WSL restart | Start service again; consider a small shell alias |
-| Nest can’t connect | Confirm URL user/db/password/port; test with `psql` first |
-| Permission denied on tables | Connect to correct DB; check table owner/`GRANT`s |
+
+| Problem                          | Likely fix                                                |
+| -------------------------------- | --------------------------------------------------------- |
+| `connection refused` on `5432`   | `sudo service postgresql start`                           |
+| `password authentication failed` | Reset password; check `pg_hba.conf`; use `-h localhost`   |
+| `peer authentication failed`     | Connect with matching OS user, or use password + host     |
+| Service dies after WSL restart   | Start service again; consider a small shell alias         |
+| Nest can’t connect               | Confirm URL user/db/password/port; test with `psql` first |
+| Permission denied on tables      | Connect to correct DB; check table owner/`GRANT`s         |
+
 
 Grant example after creating tables as another role:
 
@@ -685,15 +755,19 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO nestuser;
 
 ---
 
+
+
 ## 18. Safe local habits
 
-1. Use a **dedicated database per project** (`notes_app`, not your personal everything DB).  
-2. Keep credentials in `.env`, never in git.  
-3. Practice `ON DELETE` choices before enabling cascade in real apps.  
-4. Prefer migrations once you start Nest — treat raw SQL as learning and emergency tooling.  
+1. Use a **dedicated database per project** (`notes_app`, not your personal everything DB).
+2. Keep credentials in `.env`, never in git.
+3. Practice `ON DELETE` choices before enabling cascade in real apps.
+4. Prefer migrations once you start Nest — treat raw SQL as learning and emergency tooling.
 5. Take a dump before big experiments: `pg_dump …`.
 
 ---
+
+
 
 ## Quick command sheet
 
