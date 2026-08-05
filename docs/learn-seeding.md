@@ -57,11 +57,86 @@ Client ──1:1──► Profile          (FK lives on profiles.client_id)
 3. `Tag` (independent — no FK to clients/posts)
 4. `Post` (needs `Client` + `Profile`; attach `Tag[]`)
 
-You *can* create Client + Profile (+ Posts) in one `save()` because of cascade — see §7.
+You *can* create Client + Profile (+ Posts) in one `save()` because of cascade — see §8.
 
 ---
 
-## 3. Install
+## 3. Folder structure
+
+Keep seeding **outside** feature modules so factories/seeders stay CLI-friendly and do not mix with Nest controllers/services.
+
+```
+lear-nest/
+├── package.json                          # "seed" script
+├── lib/
+│   └── db-config.ts                      # Nest TypeOrmModule config (unchanged)
+├── src/
+│   ├── app.module.ts
+│   ├── main.ts
+│   │
+│   ├── client/
+│   │   └── entities/client.entity.ts
+│   ├── profile/
+│   │   └── entities/profile.entity.ts
+│   ├── post/
+│   │   └── entities/post.entity.ts
+│   ├── tag/
+│   │   └── entities/tag.entity.ts
+│   ├── book/
+│   │   └── book.entity.ts
+│   │
+│   └── database/                         # ← all seeding lives here
+│       ├── data-source.ts                # standalone TypeORM DataSource + SeederOptions
+│       ├── seed.ts                       # entry: initialize → runSeeders → destroy
+│       │
+│       ├── factories/                    # one factory file per entity (Faker blueprints)
+│       │   ├── client.factory.ts
+│       │   ├── profile.factory.ts
+│       │   ├── post.factory.ts
+│       │   ├── tag.factory.ts
+│       │   └── book.factory.ts
+│       │
+│       └── seeds/                        # seeders orchestrate order + relations
+│           ├── main.seeder.ts            # primary seeder (clients → profiles → posts/tags)
+│           └── demo.seeder.ts            # optional smaller/demo seeder
+│
+└── docs/
+    └── learn-seeding.md                  # this guide
+```
+
+| Path | Responsibility |
+|------|----------------|
+| `src/database/data-source.ts` | DB connection for CLI; lists `entities`, `factories`, `seeds` |
+| `src/database/seed.ts` | Runnable entry point (`pnpm seed`) |
+| `src/database/factories/*.factory.ts` | How to invent **one** fake row (no FK wiring) |
+| `src/database/seeds/*.seeder.ts` | How many rows, **order**, and relation wiring |
+| Feature `entities/` | Unchanged — factories import from here |
+
+**Globs** (must match this layout) in `data-source.ts`:
+
+```typescript
+factories: ['src/database/factories/**/*{.ts,.js}'],
+seeds: ['src/database/seeds/**/*{.ts,.js}'],
+```
+
+**Optional alternative** (same idea, different root name):
+
+```
+src/
+└── database/
+    ├── data-source.ts
+    ├── seed.ts
+    ├── factories/
+    └── seeders/          # some repos name this folder "seeders" instead of "seeds"
+```
+
+If you rename the folder, update the `seeds:` glob to match.
+
+**What not to do:** put factories inside `client/` / `post/` modules unless you also teach Nest to load them — the CLI DataSource will not see Nest module folders automatically.
+
+---
+
+## 4. Install
 
 ```bash
 pnpm add -D typeorm-extension @faker-js/faker
@@ -84,7 +159,7 @@ Add npm scripts (example):
 
 ---
 
-## 4. DataSource for seeding
+## 5. DataSource for seeding
 
 Create a standalone TypeORM `DataSource` (not Nest’s `TypeOrmModule`). Path suggestion: `src/database/data-source.ts`.
 
@@ -146,7 +221,7 @@ pnpm seed
 
 ---
 
-## 5. Factories with Faker (one per entity)
+## 6. Factories with Faker (one per entity)
 
 Factories describe **one** entity instance. They should **not** invent related rows by default — seeders wire relations.
 
@@ -255,7 +330,7 @@ export default setSeederFactory(Book, () => {
 
 ---
 
-## 6. Main seeder — wiring your relations
+## 7. Main seeder — wiring your relations
 
 ```typescript
 // src/database/seeds/main.seeder.ts
@@ -342,9 +417,9 @@ const randomTags = faker.helpers.arrayElements(tags, { min: 1, max: 3 });
 
 ---
 
-## 7. Dealing with each relation type (your code)
+## 8. Dealing with each relation type (your code)
 
-### 7.1 OneToOne — `Client` ↔ `Profile`
+### 8.1 OneToOne — `Client` ↔ `Profile`
 
 **Facts from your entities:**
 
@@ -375,7 +450,7 @@ await dataSource.getRepository(Client).save(client);
 
 ---
 
-### 7.2 ManyToOne / OneToMany — `Post` → `Client` & `Post` → `Profile`
+### 8.2 ManyToOne / OneToMany — `Post` → `Client` & `Post` → `Profile`
 
 **Facts:**
 
@@ -420,7 +495,7 @@ Because Post also requires `profile`, cascade-from-Client alone is awkward. Easi
 
 ---
 
-### 7.3 ManyToMany — `Post` ↔ `Tag`
+### 8.3 ManyToMany — `Post` ↔ `Tag`
 
 **Facts:**
 
@@ -463,7 +538,7 @@ await postRepo.save(post!);
 
 ---
 
-## 8. Full “happy path” seeder (copy-paste style)
+## 9. Full “happy path” seeder (copy-paste style)
 
 Minimal version that mirrors your schema:
 
@@ -535,7 +610,7 @@ ORDER BY c.id, po.id;
 
 ---
 
-## 9. Nested cascade example (Client owns graph)
+## 10. Nested cascade example (Client owns graph)
 
 Because `Client` has `cascade: true` on `profile` and `posts`, and `Post` has `cascade: true` on `tags`:
 
@@ -568,7 +643,7 @@ await clientRepo.save(client);
 
 ---
 
-## 10. Idempotent / re-runnable seeds
+## 11. Idempotent / re-runnable seeds
 
 `save()` again will **duplicate** rows (unique emails/titles will explode).
 
@@ -602,7 +677,7 @@ await clientRepo.upsert(
 
 ---
 
-## 11. NestJS tip: seed without leaving Nest
+## 12. NestJS tip: seed without leaving Nest
 
 CLI DataSource is enough for learning. If you prefer Nest DI:
 
@@ -626,8 +701,9 @@ You still need factories/seeds registered the same way on that `DataSource`.
 
 ---
 
-## 12. Checklist for *this* project
+## 13. Checklist for *this* project
 
+- [ ] Create `src/database/{data-source.ts,seed.ts,factories/,seeds/}` as in §3
 - [ ] Install `typeorm-extension` + `@faker-js/faker`
 - [ ] Add `DataSource` with explicit `entities: [Client, Profile, Post, Tag, Book]`
 - [ ] Factories respect varchar lengths (`name` 50, `tag.name` 20, unique email/title)
@@ -640,7 +716,7 @@ You still need factories/seeds registered the same way on that `DataSource`.
 
 ---
 
-## 13. Mental model (cheat sheet)
+## 14. Mental model (cheat sheet)
 
 ```
 Create parents first          →  Client, Tag

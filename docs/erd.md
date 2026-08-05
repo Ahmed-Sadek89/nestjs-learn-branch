@@ -1,12 +1,14 @@
 # Database ERD
 
 > Auto-generated from the live Postgres schema. Do not edit by hand.
-> Last updated: 2026-08-05T00:27:30.302Z
+> Last updated: 2026-08-05T13:56:53.099Z
 
 ```mermaid
 erDiagram
     clients ||--o{ posts : "client"
     profiles ||--o{ posts : "profile"
+    posts ||--|| posts_tags : "post"
+    tags ||--|| posts_tags : "tag"
     clients ||--|| profiles : "client"
 
     books {
@@ -35,10 +37,21 @@ erDiagram
         integer profile_id FK
     }
 
+    posts_tags {
+        integer tag_id PK,FK
+        integer post_id PK,FK
+    }
+
     profiles {
         integer id PK
         varchar bio
         integer client_id UK,FK
+        timestamptz createdAt
+    }
+
+    tags {
+        integer id PK
+        varchar name
         timestamptz createdAt
     }
 ```
