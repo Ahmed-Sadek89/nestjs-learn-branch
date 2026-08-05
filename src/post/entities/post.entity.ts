@@ -1,6 +1,7 @@
 import { Client } from "src/client/entities/client.entity";
 import { Profile } from "src/profile/entities/profile.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Tag } from "src/tag/entities/tag.entity";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("posts")
 export class Post {
@@ -50,4 +51,15 @@ export class Post {
     )
     @JoinColumn({ name: "profile_id" })
     profile!: Profile
+
+
+    @ManyToMany(
+        () => Tag,
+        (tag) => tag.posts,
+        {
+            cascade: true,
+            eager: false,
+        }
+    )
+    tags!: Tag[]
 }

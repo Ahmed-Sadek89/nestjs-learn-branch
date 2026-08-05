@@ -30,10 +30,11 @@ export class PostService {
   async findAll() {
     try {
       const posts = await this.postRepository.find({
-        // relations: {
-        //   client: true,
-        //   profile: true,
-        // },
+        relations: {
+          tags: true,
+          profile: true,
+          client: true,
+        },
       });
       return {
         message: "Posts found successfully",

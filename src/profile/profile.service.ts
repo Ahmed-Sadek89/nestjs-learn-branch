@@ -44,7 +44,12 @@ export class ProfileService {
 
   async findAll() {
     try {
-      const all = await this.profileRepo.find();
+      const all = await this.profileRepo.find({
+        relations: {
+          client: true,
+          posts: true,
+        }
+      });
       return {
         total: all.length,
         data: all
@@ -56,7 +61,10 @@ export class ProfileService {
 
   async findOne(id: number) {
     try {
-      const profile = await this.profileRepo.findOne({ where: { id } });
+      const profile = await this.profileRepo.findOne({
+        where: { id },
+        relations: { client: true, posts: true }
+      });
       return {
         message: "Profile found successfully",
         data: profile

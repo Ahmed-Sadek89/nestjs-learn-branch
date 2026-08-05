@@ -35,7 +35,7 @@ export class Client {
         (profile) => profile.client,
         {
             cascade: true,
-            eager: true
+            eager: false,
         }
     )
     profile!: Profile

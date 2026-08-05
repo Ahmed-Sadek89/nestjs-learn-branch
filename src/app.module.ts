@@ -7,6 +7,7 @@ import { dbConfig } from 'lib/db-config';
 import { ClientModule } from './client/client.module';
 import { ProfileModule } from './profile/profile.module';
 import { PostModule } from './post/post.module';
+import { TagModule } from './tag/tag.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot(dbConfig),
@@ -14,6 +15,7 @@ import { PostModule } from './post/post.module';
     ClientModule,
     ProfileModule,
     PostModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService],

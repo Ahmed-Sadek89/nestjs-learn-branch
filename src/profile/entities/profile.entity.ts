@@ -38,7 +38,7 @@ export class Profile {
         (post) => post.profile,
         {
             cascade: true,
-            eager: true
+            eager: false
         }
     )
     posts!: Post[]
