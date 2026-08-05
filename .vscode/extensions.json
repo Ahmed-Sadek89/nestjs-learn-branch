@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "dbcode.dbcode",
+    "cweijan.vscode-database-client2",
+    "cweijan.dbclient-jdbc"
+  ]
+}

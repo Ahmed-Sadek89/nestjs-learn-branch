@@ -1,5 +1,6 @@
+import { Post } from "src/post/entities/post.entity";
 import { Profile } from "src/profile/entities/profile.entity";
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("clients")
 export class Client {
@@ -38,4 +39,14 @@ export class Client {
         }
     )
     profile!: Profile
+
+    @OneToMany(
+        () => Post,
+        (post) => post.client,
+        {
+            cascade: true,
+            eager: false
+        }
+    )
+    posts!: Post[]
 }
