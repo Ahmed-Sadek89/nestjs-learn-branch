@@ -4,6 +4,8 @@ import { UpdateClientDto } from './dto/update-client.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client } from './entities/client.entity';
 import { Repository } from 'typeorm';
+import { FilterClientDto } from './dto/filter-client.dto';
+import { paginate } from 'src/common/pagination';
 
 @Injectable()
 export class ClientService {
@@ -25,13 +27,9 @@ export class ClientService {
     }
   }
 
-  async findAll() {
+  async findAll(query: FilterClientDto) {
     try {
-      const all = await this.clientRepo.find();
-      return {
-        total: all.length,
-        data: all
-      };
+      return await paginate(this.clientRepo, query);
     } catch (error) {
       throw new BadRequestException(error instanceof Error ? error.message : "Error finding clients");
     }

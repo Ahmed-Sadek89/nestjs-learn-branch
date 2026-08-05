@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
+import { FilterClientDto } from './dto/filter-client.dto';
 
 @Controller('clients')
 export class ClientController {
@@ -13,8 +14,8 @@ export class ClientController {
   }
 
   @Get()
-  async findAll() {
-    return await this.clientService.findAll();
+  async findAll(@Query() query: FilterClientDto) {
+    return await this.clientService.findAll(query);
   }
 
   @Get(':email')
