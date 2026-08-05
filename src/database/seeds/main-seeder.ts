@@ -21,7 +21,7 @@ export default class MainSeeder implements Seeder {
 
     // 1) Clients (users)
     const clients = await Promise.all(
-      Array.from({ length: 5 }, () => clientFactory.save()),
+      Array.from({ length: 50 }, () => clientFactory.save()),
     );
 
     // 2) One Profile per Client (1:1)
@@ -36,7 +36,7 @@ export default class MainSeeder implements Seeder {
     for (let i = 0; i < profiles.length; i++) {
       const client = clients[i];
       const profile = profiles[i];
-      for (let j = 0; j < 2; j++) {
+      for (let j = 0; j < 6; j++) {
         await postFactory.save({ client, profile });
         postCount += 1;
       }
