@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,6 +11,10 @@ import { PostModule } from './post/post.module';
 import { TagModule } from './tag/tag.module';
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forRoot(dbConfig),
     BookModule,
     ClientModule,
@@ -20,4 +25,5 @@ import { TagModule } from './tag/tag.module';
   controllers: [AppController],
   providers: [AppService],
 })
+
 export class AppModule { };
