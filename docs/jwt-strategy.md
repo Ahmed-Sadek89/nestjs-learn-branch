@@ -4,6 +4,8 @@ How JWT works **in this repo right now**: packages, files, login, Bearer header,
 
 There is **no Passport local strategy**. Login is a normal `POST` with `@Body()`. JWT is only used **after** login, on protected routes.
 
+Refresh tokens: [refresh-token.md](./refresh-token.md).
+
 ---
 
 ## 1. Packages
