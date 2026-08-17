@@ -9,6 +9,7 @@ import { ClientModule } from './client/client.module';
 import { ProfileModule } from './profile/profile.module';
 import { PostModule } from './post/post.module';
 import { TagModule } from './tag/tag.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,6 +22,7 @@ import { TagModule } from './tag/tag.module';
     ProfileModule,
     PostModule,
     TagModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

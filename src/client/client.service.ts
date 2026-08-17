@@ -48,6 +48,29 @@ export class ClientService {
     }
   }
 
+  async findByEmail(email: string) {
+    try {
+      const data = await this.clientRepo.findOne({
+        where: { email },
+        select: {
+          id: true,
+          email: true,
+          password: true,
+        }
+      });
+      if (!data) {
+        return null;
+      }
+      return {
+        message: "Client found successfully",
+        data: data
+      };
+    }
+    catch (error) {
+      throw new BadRequestException(error instanceof Error ? error.message : "Error finding client");
+    }
+  }
+
   async update(id: number, updateClientDto: UpdateClientDto) {
     try {
       const updatedClient = await this.clientRepo.update(id, updateClientDto);
