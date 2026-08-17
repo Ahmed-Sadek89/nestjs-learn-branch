@@ -18,9 +18,10 @@ export class ClientService {
     try {
       const client = this.clientRepo.create(createClientDto);
       await this.clientRepo.save(client);
+      const { password: _, ...safe } = client;
       return {
         message: "Client created successfully",
-        data: client
+        data: safe
       };
     } catch (error) {
       throw new BadRequestException(error instanceof Error ? error.message : "Error creating client");

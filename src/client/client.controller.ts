@@ -4,7 +4,7 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { FilterClientDto } from './dto/filter-client.dto';
 
-@Controller('clients')
+@Controller('users')
 export class ClientController {
   constructor(private readonly clientService: ClientService) { }
 

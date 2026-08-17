@@ -21,4 +21,12 @@ export class CreateClientDto {
         message: "The email must be a valid email"
     }) 
     email!: string
+
+    @IsString({
+        message: "The password must be a string"
+    })
+    @MinLength(8, {
+        message: "The password must be at least 8 characters"
+    })
+    password!: string
 }
