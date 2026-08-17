@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -46,6 +46,17 @@ export class ClientService {
     } catch (error) {
       throw new BadRequestException(error instanceof Error ? error.message : "Error finding client");
     }
+  }
+
+  async findById(id: number) {
+    const data = await this.clientRepo.findOne({ where: { id } });
+    if (!data) {
+      throw new NotFoundException("User not found");
+    }
+    return {
+      message: "Client found successfully",
+      data,
+    };
   }
 
   async findByEmail(email: string) {
